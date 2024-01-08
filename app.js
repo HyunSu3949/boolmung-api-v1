@@ -21,7 +21,10 @@ app.use(helmet());
 
 app.use(
   cors({
-    origin: "http://localhost:5500", //프론트 개발
+    origin: [
+      "http://localhost:5500", // 로컬 개발 서버
+      "https://boolmung-client-v1-bpbm63vcj-hyunsu3949.vercel.app", // 프로덕션 서버
+    ],
     credentials: true,
   })
 );
