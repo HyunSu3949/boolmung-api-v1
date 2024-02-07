@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       validate: [validator.isEmail, "이메일 형식으로 입력하세요"],
     },
-    photo: String,
+    image: String,
     password: {
       type: String,
       required: [true, "비밀번호를 입력하세요"],

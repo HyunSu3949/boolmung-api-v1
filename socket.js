@@ -14,30 +14,19 @@ module.exports = (server, app) => {
   });
 
   app.set("io", io);
-  const room = io.of("/room");
   const chat = io.of("/chat");
-  const position = io.of("/position");
-
-  room.on("connection", (socket) => {
-    console.log("room 네임스페이스에 접속");
-
-    socket.on("newRoom", (data) => {});
-
-    socket.on("disconnect", () => {
-      console.log("room 네임스페이스 접속 해제");
-    });
-  });
 
   chat.on("connection", (socket) => {
     console.log("chat 네임스페이스에 접속");
 
     socket.on("join", (data) => {
       console.log("join 이벤트 발생");
-      const { roomId, userId, name } = data;
+      const { roomId, _id, name } = data;
       socket.join(roomId);
+      console.log("join id: ", socket.id);
 
       socketUserMap[socket.id] = {
-        userId,
+        _id,
         roomId,
         name,
       };
@@ -51,19 +40,19 @@ module.exports = (server, app) => {
     socket.on("chat", (data) => {
       console.log("chat 이벤트 발생");
       console.log(data);
-      const { userId, roomId, name, message } = data;
+      const { _id, roomId, name, message } = data;
       chat.to(roomId).emit("chat", {
         type: "user",
-        _id: userId,
+        _id,
         name,
         message,
       });
     });
 
     socket.on("move", (data) => {
-      const { roomId, userId, input, position, cameraCharacterAngleY } = data;
+      const { roomId, _id, input, position, cameraCharacterAngleY } = data;
       actionState[socket.id] = {
-        userId,
+        _id,
         input,
         position,
         cameraCharacterAngleY,
@@ -76,7 +65,8 @@ module.exports = (server, app) => {
 
       if (!socketUserMap[socket.id]) return;
 
-      const { userId, roomId, name } = socketUserMap[socket.id];
+      const { _id, roomId, name } = socketUserMap[socket.id];
+      console.log("id: ", socket.id);
 
       delete socketUserMap[socket.id];
       delete actionState[socket.id];
@@ -87,13 +77,12 @@ module.exports = (server, app) => {
         roomId,
         {
           $pull: {
-            participants: { user: userId },
+            participants: { user: _id },
           },
         },
         { new: true }
       );
 
-      console.log(room.participants);
       if (room.participants.length === 0) {
         await Room.findByIdAndDelete(roomId);
         io.of("/room").emit("roomDeleted", roomId);
@@ -104,9 +93,5 @@ module.exports = (server, app) => {
         });
       }
     });
-  });
-
-  position.on("connection", (socket) => {
-    console.log("position 네임스페이스에 접속");
   });
 };

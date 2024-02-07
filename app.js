@@ -24,6 +24,7 @@ app.use(
     origin: [
       "http://localhost:5500", // 로컬 개발 서버
       "https://boolmung-client-v1.vercel.app", // 프로덕션 서버
+      "*",
     ],
     credentials: true,
   })
@@ -33,8 +34,8 @@ app.options("*", cors());
 
 app.use(express.static(`${__dirname}/public`));
 
-app.use((req, res, next) => {
-  next();
+app.get("/", (req, res) => {
+  res.status(200).send("Hello from the server!");
 });
 
 // Routes
