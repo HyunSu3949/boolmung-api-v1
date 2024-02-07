@@ -21,11 +21,7 @@ app.use(helmet());
 
 app.use(
   cors({
-    origin: [
-      "http://localhost:5500", // 로컬 개발 서버
-      "https://boolmung-client-v1.vercel.app", // 프로덕션 서버
-      "*",
-    ],
+    origin: ["http://localhost:5500", "*"],
     credentials: true,
   })
 );
@@ -33,11 +29,9 @@ app.use(
 app.options("*", cors());
 
 app.use(express.static(`${__dirname}/public`));
-
 app.get("/", (req, res) => {
   res.status(200).send("Hello from the server!");
 });
-
 // Routes
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/rooms", roomRouter);
