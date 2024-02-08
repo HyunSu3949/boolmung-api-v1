@@ -1,5 +1,8 @@
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
+const https = require("https");
+const fs = require("fs");
+
 const Socket = require("./socket");
 
 process.on("uncaughtException", (err) => {
@@ -20,9 +23,32 @@ mongoose
   .then(() => console.log("DB connection successful!"));
 
 const port = process.env.PORT || 3000;
-const server = app.listen(port, () => {
-  console.log(`App running on port ${port}...`);
-});
+
+let server;
+
+if (process.env == "procuction") {
+  const sslOptions = {
+    key: fs.readFileSync(
+      path.join(
+        __dirname,
+        "/etc/letsencrypt/live/www.boolmung.duckdns.org/fullchain.pem"
+      )
+    ),
+    cert: fs.readFileSync(
+      path.join(
+        __dirname,
+        "/etc/letsencrypt/live/www.boolmung.duckdns.org/privkey.pem"
+      )
+    ),
+  };
+  server = https.createServer(sslOptions, app).listen(port, () => {
+    console.log(`HTTPS App running on port ${port}...`);
+  });
+} else {
+  server = app.listen(port, () => {
+    console.log(`App running on port ${port}...`);
+  });
+}
 
 Socket(server, app);
 
