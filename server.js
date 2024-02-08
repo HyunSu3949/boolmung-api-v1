@@ -29,8 +29,7 @@ let server;
 if (process.env.NODE_ENV === "production") {
   const sslOptions = {
     key: fs.readFileSync( "/etc/letsencrypt/live/www.boolmung.duckdns.org/fullchain.pem"),
-    cert: fs.readFileSync("/etc/letsencrypt/live/www.boolmung.duckdns.org/privkey.pem"),
-    ),
+    cert: fs.readFileSync("/etc/letsencrypt/live/www.boolmung.duckdns.org/privkey.pem")
   };
   server = https.createServer(sslOptions, app).listen(port, () => {
     console.log(`HTTPS App running on port ${port}...`);
