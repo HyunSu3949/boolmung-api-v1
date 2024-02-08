@@ -26,7 +26,7 @@ const port = process.env.PORT || 3000;
 
 let server;
 
-if (process.env == "procuction") {
+if (process.env.NODE_ENV === "procuction") {
   const sslOptions = {
     key: fs.readFileSync(
       path.join(
