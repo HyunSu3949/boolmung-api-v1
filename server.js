@@ -23,7 +23,7 @@ mongoose
   .then(() => console.log("DB connection successful!"));
 
 const port = process.env.PORT || 3000;
-
+console.log(port,process.env.PORT,'prt-----');
 let server;
 
 if (process.env.NODE_ENV === "production") {
@@ -31,7 +31,6 @@ if (process.env.NODE_ENV === "production") {
     cert: fs.readFileSync( "/etc/letsencrypt/live/www.boolmung.duckdns.org/fullchain.pem"),
     key: fs.readFileSync("/etc/letsencrypt/live/www.boolmung.duckdns.org/privkey.pem")
   };
-  console.log(sslOptions.key);
   server = https.createServer(sslOptions, app).listen(port, () => {
     console.log(`HTTPS App running on port ${port}...`);
   });
