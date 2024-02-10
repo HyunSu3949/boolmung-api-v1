@@ -1,7 +1,5 @@
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
-const https = require("https");
-const fs = require("fs");
 
 const Socket = require("./socket");
 
@@ -23,22 +21,10 @@ mongoose
   .then(() => console.log("DB connection successful!"));
 
 const port = process.env.PORT || 3000;
-console.log(port,process.env.PORT,'prt-----');
-let server;
-
-if (process.env.NODE_ENV === "production") {
-  const sslOptions = {
-    cert: fs.readFileSync( "/etc/letsencrypt/live/www.boolmung.duckdns.org/fullchain.pem"),
-    key: fs.readFileSync("/etc/letsencrypt/live/www.boolmung.duckdns.org/privkey.pem")
-  };
-  server = https.createServer(sslOptions, app).listen(port, () => {
-    console.log(`HTTPS App running on port ${port}...`);
-  });
-} else {
-  server = app.listen(port, () => {
+const server = server = app.listen(port, () => {
     console.log(`App running on port ${port}...`);
-  });
-}
+});;
+
 
 Socket(server, app);
 
