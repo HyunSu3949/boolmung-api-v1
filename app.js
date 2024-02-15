@@ -21,7 +21,7 @@ app.use(helmet());
 
 app.use(
   cors({
-    origin: ["http://localhost:5500", "*"],
+    origin: ["http://localhost:5500", "https://d221beexgvmcjq.cloudfront.net"],
     credentials: true,
   })
 );
