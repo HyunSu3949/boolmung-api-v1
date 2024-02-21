@@ -1,5 +1,6 @@
 const SocketIO = require("socket.io");
 const Room = require("./models/roomModel");
+const Chat = require("./models/Chat");
 
 const eventName = {
   SOCKET_CONNECT: "socket/connect",
