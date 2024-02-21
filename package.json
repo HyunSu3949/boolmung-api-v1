@@ -8,12 +8,15 @@
     "dev": "pm2 start -i 1 ecosystem.config.js --env development"
   },
   "dependencies": {
+    "aws-sdk": "^2.1559.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
+    "connect-mongo": "^5.1.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
+    "express-session": "^1.18.0",
     "helmet": "^3.16.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^7.0.2",

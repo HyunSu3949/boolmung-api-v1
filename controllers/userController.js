@@ -65,14 +65,12 @@ const filterObj = (obj, ...allowedFields) => {
 };
 
 exports.updateMe = catchAsync(async (req, res, next) => {
-  req.body.image = "/img/users/" + req.file.image;
   // 패스워드 업데이트 방지
   if (req.body.password || req.body.passwordConfirm) {
     return next(new AppError("패스워드는 다른 라우트에서 수정하세요", 400));
   }
 
-  // name, photo 변경 가능
-  const filteredBody = filterObj(req.body, "image");
+  const filteredBody = filterObj(req.body, "image", "name");
   const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
     new: true,
     runValidators: true,

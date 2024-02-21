@@ -10,14 +10,12 @@ exports.createRoom = catchAsync(async (req, res, next) => {
     title: req.body.title,
     max: req.body.max,
     owner: req.user.id,
-    participants: [{ user: req.user.id }],
+    participants: [],
   });
 
   res.status(201).json({
     status: "success",
-    data: {
-      data: newRoom,
-    },
+    data: newRoom,
   });
 });
 

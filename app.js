@@ -8,6 +8,7 @@ const AppError = require("./utils/appError");
 const globalErrorHandler = require("./controllers/errorController");
 const userRouter = require("./routes/userRoutes");
 const roomRouter = require("./routes/roomRoutes");
+const s3Router = require("./routes/s3Routes");
 
 const app = express();
 
@@ -32,9 +33,11 @@ app.use(express.static(`${__dirname}/public`));
 app.get("/", (req, res) => {
   res.status(200).send("Hello from the server!");
 });
+
 // Routes
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/rooms", roomRouter);
+app.use("/api/v1/s3", s3Router);
 
 app.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
