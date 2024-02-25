@@ -11,6 +11,7 @@ const eventName = {
   FULL: "socket/full",
   NOTFOUND: "socket/notfound",
   GET_ROOM_INFO: "socket/getRoomInfo",
+  LEAVE: "socket/leave",
 };
 
 const actionState = {};
@@ -54,12 +55,12 @@ module.exports = (server, app) => {
         );
 
         if (!room) {
-          socket.emit(eventName.NOTFOUND, "이미 삭제된 방입니다");
+          socket.emit(eventName.NOTFOUND, { message: "이미 삭제된 방입니다" });
           return;
         }
 
         if (room.participants.length > room.max) {
-          socket.emit(eventName.FULL, "방이 가득 찼습니다");
+          socket.emit(eventName.FULL, { message: "방이 가득 찼습니다" });
           return;
         }
         socket.emit(eventName.GET_ROOM_INFO, room);
@@ -110,7 +111,7 @@ module.exports = (server, app) => {
       });
     });
 
-    socket.on("disconnect", async () => {
+    socket.on(eventName.LEAVE, async () => {
       if (!socket.user) return;
 
       const { _id, roomId, name } = socket.user;
@@ -125,6 +126,46 @@ module.exports = (server, app) => {
           type: "system",
           message: `${name}님이 퇴장하셨습니다.`,
         });
+
+        if (room.participants.length === 0) {
+          setTimeout(async () => {
+            const checkRoom = await Room.findById(roomId);
+            if (checkRoom && checkRoom.participants.length === 0) {
+              await Room.deleteOne({ _id: roomId });
+            }
+          }, 3000);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    });
+
+    socket.on("disconnect", async () => {
+      if (!socket.user) return;
+
+      const { _id, roomId, name } = socket.user;
+      try {
+        const room = await Room.findByIdAndUpdate(
+          roomId,
+          { $pull: { participants: { user: _id } } },
+          { new: true }
+        );
+
+        if (room.participants.length !== room.max) {
+          chat.to(roomId).emit(eventName.CHAT, {
+            type: "system",
+            message: `${name}님이 퇴장하셨습니다.`,
+          });
+        }
+
+        if (room.participants.length === 0) {
+          setTimeout(async () => {
+            const checkRoom = await Room.findById(roomId);
+            if (checkRoom && checkRoom.participants.length === 0) {
+              await Room.deleteOne({ _id: roomId });
+            }
+          }, 3000);
+        }
       } catch (error) {
         console.log(error);
       }

@@ -20,14 +20,24 @@ exports.createRoom = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllRoom = catchAsync(async (req, res, next) => {
-  const Rooms = await Room.find();
+  let { page, sortby } = req.query;
+  page = page * 1 || 1; // 기본 페이지는 1
+  limit = 8; // 페이지당 항목 수, 기본값 8
+  const skip = (page - 1) * limit; // 건너뛸 항목 수
+  const total = await Room.countDocuments();
+  const Rooms = await Room.find().skip(skip).limit(limit);
+  const totalPages = Math.ceil(total / limit);
+  const hasNextPage = page < totalPages;
 
   res.status(200).json({
     status: "sucees",
     length: Rooms.length,
-    data: {
-      data: Rooms,
-    },
+    total,
+    currentPage: page,
+    totalPages,
+    hasNextPage,
+    nextPage: hasNextPage ? page + 1 : null,
+    data: Rooms,
   });
 });
 
