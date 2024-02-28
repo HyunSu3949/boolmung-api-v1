@@ -12,6 +12,8 @@ const eventName = {
   NOTFOUND: "socket/notfound",
   GET_ROOM_INFO: "socket/getRoomInfo",
   LEAVE: "socket/leave",
+  POS: "socket/pos",
+  SENDINITIALPOS: "socket/initpos",
 };
 
 const actionState = {};
@@ -111,33 +113,19 @@ module.exports = (server, app) => {
       });
     });
 
-    socket.on(eventName.LEAVE, async () => {
-      if (!socket.user) return;
+    socket.on(eventName.LEAVE, async (data) => {
+      const { roomId } = socket.user;
+      chat.to(roomId).emit(eventName.LEAVE, data);
+    });
 
-      const { _id, roomId, name } = socket.user;
-      try {
-        const room = await Room.findByIdAndUpdate(
-          roomId,
-          { $pull: { participants: { user: _id } } },
-          { new: true }
-        );
-
-        chat.to(roomId).emit(eventName.CHAT, {
-          type: "system",
-          message: `${name}님이 퇴장하셨습니다.`,
-        });
-
-        if (room.participants.length === 0) {
-          setTimeout(async () => {
-            const checkRoom = await Room.findById(roomId);
-            if (checkRoom && checkRoom.participants.length === 0) {
-              await Room.deleteOne({ _id: roomId });
-            }
-          }, 3000);
-        }
-      } catch (error) {
-        console.log(error);
-      }
+    socket.on(eventName.POS, async (data) => {
+      const { roomId } = socket.user;
+      chat.to(roomId).emit(eventName.POS, data);
+    });
+    socket.on(eventName.SENDINITIALPOS, async (data) => {
+      const { roomId } = socket.user;
+      console.log("서버에서 받는 초기 pos", data);
+      chat.to(roomId).emit(eventName.SENDINITIALPOS, data);
     });
 
     socket.on("disconnect", async () => {

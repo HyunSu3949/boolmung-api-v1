@@ -25,7 +25,10 @@ exports.getAllRoom = catchAsync(async (req, res, next) => {
   limit = 8; // 페이지당 항목 수, 기본값 8
   const skip = (page - 1) * limit; // 건너뛸 항목 수
   const total = await Room.countDocuments();
-  const Rooms = await Room.find().skip(skip).limit(limit);
+  const Rooms = await Room.find()
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
   const totalPages = Math.ceil(total / limit);
   const hasNextPage = page < totalPages;
 
