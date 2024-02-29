@@ -85,7 +85,7 @@ module.exports = (server, app) => {
       const { _id, roomId, name, message } = data;
 
       chat.to(roomId).emit(eventName.CHAT, {
-        type: _id == socket.user._id ? "mine" : "other",
+        type: "user",
         _id,
         name,
         message,
